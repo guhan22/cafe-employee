@@ -8,7 +8,7 @@ services:
     container_name: mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydb
+      MYSQL_DATABASE: cafe_db
       MYSQL_USER: user
       MYSQL_PASSWORD: userpassword
     ports:
@@ -16,7 +16,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - cafenetwork
+      - cafe_network
 
   # .NET 8 API
   api:
@@ -25,17 +25,16 @@ services:
       context: ./api
       dockerfile: Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=mydb;User=user;Password=userpassword;
+      - ASPNETCORE_ENVIRONMENT=Release
     ports:
       - "5000:8080"
     depends_on:
       - mysql
     networks:
-      - cafenetwork
+      - cafe_network
 
   # React JS App
-  reactapp:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile
@@ -45,11 +44,11 @@ services:
     depends_on:
       - api
     networks:
-      - cafenetwork
+      - cafe_network
 
 volumes:
   db_data:
 
 networks:
-  cafenetwork:
+  cafe_network:
     driver: bridge

@@ -1,27 +1,37 @@
+using CafeApi.Data;
+using CafeApi.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CafeApi.Controllers
 {
-	[ApiController]
+    [ApiController]
 	[Route("[controller]")]
 	public class WeatherForecastController : ControllerBase
 	{
-		private static readonly string[] Summaries = new[]
-		{
+		private readonly IConfiguration configuration;
+
+		private static readonly string[] Summaries =
+		[
 			"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-		};
+		];
 
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<WeatherForecastController> logger;
 
-		public WeatherForecastController(ILogger<WeatherForecastController> logger)
+		public WeatherForecastController(ILogger<WeatherForecastController> _logger, IConfiguration _configuration)
 		{
-			_logger = logger;
+			logger = _logger;
+			configuration = _configuration;
 		}
 
 		[HttpGet(Name = "GetWeatherForecast")]
 		public IEnumerable<WeatherForecast> Get()
 		{
-			return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+			using (var context = new CafeDbContext(configuration))
+			{
+				var books = context.Cafe.ToList();
+				Console.WriteLine("Fetched from DB");
+			}
+				return Enumerable.Range(1, 5).Select(index => new WeatherForecast
 			{
 				Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
 				TemperatureC = Random.Shared.Next(-20, 55),

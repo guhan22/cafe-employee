@@ -20,7 +20,7 @@ RUN npm run build
 FROM nginx:1.25.3 
 
 # copy build folder to nginx folder
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # default port for nginx is 80
 EXPOSE 80
