@@ -1,13 +1,28 @@
-# Build React App
-FROM node:18-alpine AS build
+# for production we give name as build 
+FROM node:20.1.0 as build
+
+# Set working directory to /app 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+
+# Copy package.json to /app
+COPY package*.json .
+
+# copy dependencies
 COPY . .
+
+# run npm install to install dependencies
+RUN npm install
+
+# for production 
 RUN npm run build
 
-# Serve React App
-FROM nginx:alpine
+# pull nginx image from docker hub
+FROM nginx:1.25.3 
+
+# copy build folder to nginx folder
 COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 3000
-CMD ["nginx", "-g", "daemon off;"]
+
+# default port for nginx is 80
+EXPOSE 80
+
+CMD [ "nginx","-g","daemon off;" ]

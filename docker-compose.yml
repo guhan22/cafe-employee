@@ -16,41 +16,40 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - mynetwork
+      - cafenetwork
 
   # .NET 8 API
   api:
-    image: mcr.microsoft.com/dotnet/aspnet:8.0 AS base
     container_name: dotnet_api
     build:
-      context: ./api # Path to your .NET API project
+      context: ./api
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=mydb;User=user;Password=userpassword;
     ports:
-      - "5000:80" # Mapping .NET API to port 5000
+      - "5000:8080"
     depends_on:
       - mysql
     networks:
-      - mynetwork
+      - cafenetwork
 
   # React JS App
   reactapp:
     build:
-      context: ./client # Path to your React JS project
+      context: ./client
       dockerfile: Dockerfile
     container_name: react_client
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - api
     networks:
-      - mynetwork
+      - cafenetwork
 
 volumes:
   db_data:
 
 networks:
-  mynetwork:
+  cafenetwork:
     driver: bridge
